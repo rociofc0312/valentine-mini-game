@@ -1004,6 +1004,7 @@
     </div>
   </div>
 
+  <audio id="final-music" src="bobby.mp3" preload="auto"></audio>
   <canvas id="confetti-canvas" class="confetti"></canvas>
 
   <script>
@@ -3075,6 +3076,8 @@ console.log("Tu amor llena al " + 100 + "% mi corazón");`;
 
     function sayYes() {
       showScreen('yes-screen');
+      const music = document.getElementById('final-music');
+      music.play();
     }
 
     // ============================================================
