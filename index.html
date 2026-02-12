@@ -694,7 +694,12 @@
 
       <canvas id="heart-catcher-canvas" width="320" height="280"></canvas>
 
-      <p class="hint-text">Usa las flechas o A/D para moverte</p>
+      <div id="catcher-mobile-controls" style="display: flex; gap: 20px; justify-content: center; margin: 10px 0;">
+        <button class="btn" ontouchstart="catcherTouchBtn('left', true)" ontouchend="catcherTouchBtn('left', false)" onmousedown="catcherTouchBtn('left', true)" onmouseup="catcherTouchBtn('left', false)" onmouseleave="catcherTouchBtn('left', false)" style="padding: 15px 25px; font-size: 1.5rem;">←</button>
+        <button class="btn" ontouchstart="catcherTouchBtn('right', true)" ontouchend="catcherTouchBtn('right', false)" onmousedown="catcherTouchBtn('right', true)" onmouseup="catcherTouchBtn('right', false)" onmouseleave="catcherTouchBtn('right', false)" style="padding: 15px 25px; font-size: 1.5rem;">→</button>
+      </div>
+
+      <p class="hint-text">Arrastra en el canvas o usa los botones</p>
       <button class="pause-btn" onclick="togglePause(1)">⏸ PAUSA</button>
       <p id="catcher-fail-msg" class="fail-message" style="display: none;"></p>
     </div>
@@ -1427,6 +1432,11 @@
       document.addEventListener('keydown', catcherKeyDown);
       document.addEventListener('keyup', catcherKeyUp);
 
+      // Touch controls for mobile
+      canvas.addEventListener('touchstart', catcherTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', catcherTouchMove, { passive: false });
+      canvas.addEventListener('touchend', catcherTouchEnd);
+
       requestAnimationFrame(updateHeartCatcher);
     }
 
@@ -1440,6 +1450,41 @@
       if (!catcherGame || isPaused) return;
       if (e.key === 'ArrowLeft' || e.key === 'a') catcherGame.keys.left = false;
       if (e.key === 'ArrowRight' || e.key === 'd') catcherGame.keys.right = false;
+    }
+
+    // Mobile touch controls for catcher
+    function catcherTouchBtn(dir, pressed) {
+      if (!catcherGame || isPaused) return;
+      if (dir === 'left') catcherGame.keys.left = pressed;
+      if (dir === 'right') catcherGame.keys.right = pressed;
+    }
+
+    let catcherTouchStartX = null;
+
+    function catcherTouchStart(e) {
+      if (!catcherGame || isPaused) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const canvas = document.getElementById('heart-catcher-canvas');
+      const rect = canvas.getBoundingClientRect();
+      catcherTouchStartX = touch.clientX - rect.left;
+    }
+
+    function catcherTouchMove(e) {
+      if (!catcherGame || isPaused || catcherTouchStartX === null) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const canvas = document.getElementById('heart-catcher-canvas');
+      const rect = canvas.getBoundingClientRect();
+      const touchX = touch.clientX - rect.left;
+
+      // Move catcher directly to finger position (centered)
+      const newX = touchX - catcherGame.catcher.width / 2;
+      catcherGame.catcher.x = Math.max(0, Math.min(canvas.width - catcherGame.catcher.width, newX));
+    }
+
+    function catcherTouchEnd(e) {
+      catcherTouchStartX = null;
     }
 
     function updateHeartCatcher(timestamp) {
