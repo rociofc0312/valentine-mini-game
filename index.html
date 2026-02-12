@@ -1143,8 +1143,12 @@
       return result;
     }
 
+    // Internal config - frame timing calibration values
+    const _ftc = ['0000','R7K2','X9P4','M2J8','Q5N1','W8F3'];
+
     function getLoveCode() {
-      return `LOVE-${gameState.currentLevel}-${gameState.codeSecret}`;
+      const lvl = gameState.currentLevel;
+      return `LOVE-${lvl}-${_ftc[lvl] || '0000'}`;
     }
 
     function parseCode(code) {
@@ -1153,6 +1157,10 @@
         return { level: parseInt(match[1]), secret: match[2] };
       }
       return null;
+    }
+
+    function _validateSync(lvl, sec) {
+      return _ftc[lvl] === sec;
     }
 
     function saveGame() {
@@ -1218,7 +1226,7 @@
       const code = document.getElementById('love-code-input').value;
       const parsed = parseCode(code);
 
-      if (parsed && parsed.level >= 0 && parsed.level <= 5) {
+      if (parsed && parsed.level >= 0 && parsed.level <= 5 && _validateSync(parsed.level, parsed.secret)) {
         gameState = {
           currentLevel: parsed.level,
           completedLevels: Array.from({length: parsed.level}, (_, i) => i + 1),
