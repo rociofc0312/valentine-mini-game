@@ -981,9 +981,9 @@
       <canvas id="treasure-canvas" width="320" height="180"></canvas>
 
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-        <button class="btn" onclick="treasureJump()">↑ Saltar</button>
-        <button class="btn" onclick="treasureMove(-1)">← Izq</button>
-        <button class="btn" onclick="treasureMove(1)">Der →</button>
+        <button class="btn" onclick="treasureJump()" ontouchstart="treasureJump()">↑ Saltar</button>
+        <button class="btn" ontouchstart="treasureBtnMove('left', true)" ontouchend="treasureBtnMove('left', false)" onmousedown="treasureBtnMove('left', true)" onmouseup="treasureBtnMove('left', false)" onmouseleave="treasureBtnMove('left', false)">← Izq</button>
+        <button class="btn" ontouchstart="treasureBtnMove('right', true)" ontouchend="treasureBtnMove('right', false)" onmousedown="treasureBtnMove('right', true)" onmouseup="treasureBtnMove('right', false)" onmouseleave="treasureBtnMove('right', false)">Der →</button>
       </div>
 
       <p class="hint-text">Flechas o botones para moverte, Espacio para saltar</p>
@@ -2729,6 +2729,12 @@ console.log("Tu amor llena al " + 100 + "% mi corazón");`;
     function treasureMove(dir) {
       if (!treasureGame || treasureGame.gameOver) return;
       treasureGame.moveDir = dir;
+    }
+
+    function treasureBtnMove(dir, pressed) {
+      if (!treasureGame || treasureGame.gameOver) return;
+      if (dir === 'left') treasureGame.keys.left = pressed;
+      if (dir === 'right') treasureGame.keys.right = pressed;
     }
 
     function treasureJump() {
